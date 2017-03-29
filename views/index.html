@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+  </head>
+
+  <body>
+
+    <div id="container" class="container" style="padding-top: 50px;">
+      <div class="jumbotron text-center">
+
+        <h1>BPM: <span id="bpm_text">0</span></h1>
+
+        <div class="row" style="padding: 10px;">
+          <button id="get_bpm" type="button" class="btn btn-primary">GET</button>
+        </div>
+
+        <div class="row" style="padding: 10px;">
+          <div class="input-group" style="width: 200px; margin: auto;">
+            <input id="bpm_put_text" type="text" class="form-control">
+            <div class="input-group-btn">
+              <button id="put_bpm" type="button" class="btn btn-default">PUT</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="well text-left" style="margin-top: 30px;">
+          <h4>Statistics</h4>
+          <div class="row center-block" style="padding: 10px; padding-bottom: 20px;">
+            <h5>Minimum BPM: <span id="min_bpm">0</span></h5>
+            <h5>Maximum BPM: <span id="max_bpm">0</span></h5>
+          </div>
+          <div class="row center-block">
+            <button type="button" class="btn btn-danger">RESET</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <audio  id="loop-limited">
+          <source src="data/click.wav" type="audio/wav">
+        Your browser does not support the audio element.
+        </audio>
+
+
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/socket.io.js"></script>
+    <script type="text/javascript">
+
+
+
+
+          $(function() {
+
+                var lc=0;
+                var myAudio = document.createElement("audio");;
+                myAudio.src = "data/click.wav";
+
+
+                // Create a new WebSocket
+                var socket = io();
+
+                // When the html element with the ID get_bpm is clicked, send a message
+                $('#get_bpm').on('click', function() {
+                  // get-bpm does not need to send any parameters
+                  socket.emit('get-bpm', {});
+                });
+
+                $('#put_bpm').on('click', function() {
+                  // get-bpm does not need to send any parameters
+                  var val = document.getElementById('bpm_put_text').value;
+                  socket.emit('put-bpm', {value: val});
+                });
+
+                // When the bpm response is received from the server, render the result
+                socket.on('bpm', function(data) {
+                  console.log('bpm', data);
+                  // Set the html tag value for the coresponding ID to the data
+                  $('#bpm_text').html(data.value);
+
+                  myAudio.addEventListener('ended', function() {
+                                if(lc<4)
+                                {
+                                        this.currentTime = 0;
+                                        setTimeout(function(){myAudio.play();lc++;}, (60000/((document.getElementById("bpm_text").innerHTML))));
+                                }
+                        }, false);
+                        myAudio.play();
+
+                        clearInterval(flash);
+
+                  var flash = setInterval(function () {
+                          $("#container").css("background-color", function () {
+                                  this.switch = !this.switch
+                                  return this.switch ? "green" : ""
+                          });
+                  }, (60000/((document.getElementById("bpm_text").innerHTML)))
+                  )
+                });
+
+                socket.on('min_bpm', function(data) {
+                  console.log('min_bpm', data);
+                  // Set the html tag value for the coresponding ID to the data
+                  $('#min_bpm').html(data.value);
+                });
+
+                socket.on('max_bpm', function(data) {
+                  console.log('max_bpm', data);
+                  // Set the html tag value for the coresponding ID to the data
+                  $('#max_bpm').html(data.value);
+                });
+          });
+        </script>
+
+  </body>
+
+</html>
+
+  </body>
+</html>
