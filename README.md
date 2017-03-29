@@ -1,6 +1,6 @@
-# mbed Device Connector Node.js Quickstart
+# IoT metronome 
 
-Example Node.js express app that talks to the mbed Device Connector.
+A metronome is a device that creates a visual or audible pulse at consistent intervals. In this project, I used a FRDM-K64F board to simulate a metronome behavior using LEDs connected to the board. The metronome has two modes, a “play” mode, in which the LED blinks at a given tempo, and a “learn” mode, in which the user sets the tempo. The metronome can be accessed and controlled via a web application made in Node.js and HTML5 that allows to interact via REST API. 
 
 ## Getting Started
 
